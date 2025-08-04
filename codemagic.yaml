@@ -4,7 +4,6 @@ workflows:
     instance_type: mac_mini_m2
 
     environment:
-      android_sdk_image: 34
       flutter: latest
       xcode: latest
       cocoapods: latest
