@@ -1,5 +1,4 @@
-# This codemagic.yaml file includes a command to fix file permissions.
-# This is the recommended solution if you cannot run git commands locally.
+# This codemagic.yaml includes a debugging step to find the generated APK.
 
 workflows:
   android-kotlin-app:
@@ -7,7 +6,6 @@ workflows:
     instance_type: mac_mini_m2
 
     environment:
-      # Specify the Java version for Gradle.
       java: 17
 
     triggering:
@@ -17,15 +15,22 @@ workflows:
     scripts:
       - name: Add execute permission to gradlew
         script: |
-          # This command makes the gradlew file executable.
-          # It fixes the "Permission denied" error.
           chmod +x ./gradlew
           
       - name: Build Android App (Release with Debug Key)
         script: |
-          # Now that gradlew is executable, this command will work.
           ./gradlew assembleRelease
 
+      - name: List build outputs to find the APK
+        script: |
+          # This command will list all files in the build directory.
+          # It will help us find the exact path of the generated .apk file.
+          # The '|| true' ensures the build doesn't fail if the directory doesn't exist.
+          find $CM_BUILD_DIR/build -type f || true
+          find $CM_BUILD_DIR/app/build -type f || true
+
+
     artifacts:
-      - build/app/outputs/apk/release/*.apk
+      # This is a more aggressive glob pattern to find the APK anywhere in the build outputs.
+      - build/**/outputs/apk/**/*.apk
       - /tmp/codemagic_logs/*.log
