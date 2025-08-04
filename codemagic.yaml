@@ -1,4 +1,5 @@
-# This codemagic.yaml is configured to build the DEBUG version of the app.
+# This is the robust "copy" method adapted for a DEBUG build.
+# It builds the debug APK and copies it to a known location before gathering artifacts.
 
 workflows:
   android-kotlin-app-debug:
@@ -6,7 +7,6 @@ workflows:
     instance_type: mac_mini_m2
 
     environment:
-      # Specify the Java version for Gradle.
       java: 17
 
     triggering:
@@ -20,10 +20,18 @@ workflows:
           
       - name: Build Android App (Debug)
         script: |
-          # The command is changed from 'assembleRelease' to 'assembleDebug'.
+          # Changed to 'assembleDebug' to build the debug variant.
           ./gradlew assembleDebug
 
+      - name: Prepare APK for artifact collection
+        script: |
+          # Create a new directory at the top level named 'artifacts'
+          mkdir -p $CM_BUILD_DIR/artifacts
+          # Copy the generated DEBUG APK from its deep folder into our new 'artifacts' folder
+          cp app/build/outputs/apk/debug/*.apk $CM_BUILD_DIR/artifacts/
+
     artifacts:
-      # The path is changed from 'release' to 'debug'.
-      - build/app/outputs/apk/debug/*.apk
+      # Now, we just collect everything from our simple, top-level 'artifacts' folder.
+      - $CM_BUILD_DIR/artifacts/*.apk
       - /tmp/codemagic_logs/*.log
+      
