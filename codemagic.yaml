@@ -1,5 +1,5 @@
-# codemagic.yaml using the system's installed Gradle instead of the wrapper.
-# NOTE: This is not the recommended approach. Using the Gradle Wrapper (`gradlew`) is best practice.
+# This codemagic.yaml file includes a command to fix file permissions.
+# This is the recommended solution if you cannot run git commands locally.
 
 workflows:
   android-kotlin-app:
@@ -7,24 +7,25 @@ workflows:
     instance_type: mac_mini_m2
 
     environment:
+      # Specify the Java version for Gradle.
       java: 17
-      # You can specify a Gradle version here.
-      # Codemagic will download and use this version.
-      # It's best to match the version you use locally.
-      gradle: 8.2
 
     triggering:
       events:
         - push
 
     scripts:
+      - name: Add execute permission to gradlew
+        script: |
+          # This command makes the gradlew file executable.
+          # It fixes the "Permission denied" error.
+          chmod +x ./gradlew
+          
       - name: Build Android App (Release with Debug Key)
         script: |
-          # This command uses the 'gradle' installed on the build machine,
-          # not the './gradlew' wrapper from your project.
-          gradle assembleRelease
+          # Now that gradlew is executable, this command will work.
+          ./gradlew assembleRelease
 
     artifacts:
       - build/app/outputs/apk/release/*.apk
       - /tmp/codemagic_logs/*.log
-      
