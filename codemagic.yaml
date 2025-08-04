@@ -1,0 +1,35 @@
+workflows:
+  android-build:
+    name: Android Build
+    instance_type: mac_mini_m2
+
+    environment:
+      android_sdk_image: 34
+      flutter: latest
+      xcode: latest
+      cocoapods: latest
+      java: 17
+
+    scripts:
+      - name: Set up local.properties
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+
+      - name: Set up Gradle properties
+        script: |
+          echo "org.gradle.daemon=false" >> "$CM_BUILD_DIR/gradle.properties"
+          echo "org.gradle.jvmargs=-Xmx2048m" >> "$CM_BUILD_DIR/gradle.properties"
+
+      - name: Get dependencies
+        script: |
+          cd android_project
+          ./gradlew dependencies
+
+      - name: Build Android Release APK
+        script: |
+          cd android_project
+          ./gradlew assembleRelease
+
+    artifacts:
+      - android_project/app/build/outputs/**/*.apk
+      - android_project/app/build/outputs/**/*.aab
