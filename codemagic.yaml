@@ -6,7 +6,6 @@ workflows:
     environment:
       flutter: latest
       xcode: latest
-      cocoapods: latest
       java: 17
 
     scripts:
