@@ -1,4 +1,5 @@
-# This codemagic.yaml includes a debugging step to find the generated APK.
+# This is the final, optimized codemagic.yaml.
+# It uses a precise artifact path based on the successful build log.
 
 workflows:
   android-kotlin-app:
@@ -21,16 +22,7 @@ workflows:
         script: |
           ./gradlew assembleRelease
 
-      - name: List build outputs to find the APK
-        script: |
-          # This command will list all files in the build directory.
-          # It will help us find the exact path of the generated .apk file.
-          # The '|| true' ensures the build doesn't fail if the directory doesn't exist.
-          find $CM_BUILD_DIR/build -type f || true
-          find $CM_BUILD_DIR/app/build -type f || true
-
-
     artifacts:
-      # This is a more aggressive glob pattern to find the APK anywhere in the build outputs.
-      - build/**/outputs/apk/**/*.apk
+      # This path is now confirmed to be correct from your build log.
+      - build/app/outputs/apk/release/*.apk
       - /tmp/codemagic_logs/*.log
