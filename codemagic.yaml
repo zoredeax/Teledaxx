@@ -1,39 +1,30 @@
-# This is a complete codemagic.yaml file.
-# It builds a native Android (Kotlin) application.
-# The 'release' build variant is intentionally signed with the default debug key.
-# No keystore configuration is required in Codemagic or your build scripts.
+# codemagic.yaml using the system's installed Gradle instead of the wrapper.
+# NOTE: This is not the recommended approach. Using the Gradle Wrapper (`gradlew`) is best practice.
 
 workflows:
   android-kotlin-app:
-    # A descriptive name for your workflow in the Codemagic UI.
     name: Android Kotlin App Build
-
-    # The type of virtual machine to run the build on.
     instance_type: mac_mini_m2
 
-    # Environment configuration for the build machine.
     environment:
-      # Specify the Java version for Gradle. Java 17 is standard for modern Android.
       java: 17
+      # You can specify a Gradle version here.
+      # Codemagic will download and use this version.
+      # It's best to match the version you use locally.
+      gradle: 8.2
 
-    # Defines what triggers the build. This example triggers on every push to any branch.
     triggering:
       events:
         - push
 
-    # The sequence of commands to execute for the build.
     scripts:
       - name: Build Android App (Release with Debug Key)
         script: |
-          # This command tells Gradle to build the 'release' variant of the app.
-          # For this to work, your app/build.gradle.kts must be configured
-          # to use the debug signing configuration for the release build type.
-          ./gradlew assembleRelease
+          # This command uses the 'gradle' installed on the build machine,
+          # not the './gradlew' wrapper from your project.
+          gradle assembleRelease
 
-    # Specifies which files to save as build artifacts after a successful build.
     artifacts:
-      # This glob pattern collects the generated APK from the release build output directory.
       - build/app/outputs/apk/release/*.apk
-      # This collects Codemagic's own log files for debugging purposes.
       - /tmp/codemagic_logs/*.log
-
+      
