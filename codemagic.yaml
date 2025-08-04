@@ -1,5 +1,5 @@
-# This is the final, optimized codemagic.yaml.
-# It uses a precise artifact path based on the successful build log.
+# This is the final, most robust codemagic.yaml.
+# It copies the final APK to a known location before gathering artifacts.
 
 workflows:
   android-kotlin-app:
@@ -22,7 +22,15 @@ workflows:
         script: |
           ./gradlew assembleRelease
 
+      - name: Prepare APK for artifact collection
+        script: |
+          # Create a new directory at the top level named 'artifacts'
+          mkdir -p $CM_BUILD_DIR/artifacts
+          # Copy the generated APK from its deep folder into our new 'artifacts' folder
+          cp app/build/outputs/apk/release/*.apk $CM_BUILD_DIR/artifacts/
+
     artifacts:
-      # This path is now confirmed to be correct from your build log.
-      - build/app/outputs/apk/release/*.apk
+      # Now, we just collect everything from our simple, top-level 'artifacts' folder.
+      - $CM_BUILD_DIR/artifacts/*.apk
       - /tmp/codemagic_logs/*.log
+      
